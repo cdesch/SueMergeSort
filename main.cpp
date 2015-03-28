@@ -354,12 +354,14 @@ void timeTrials(){
     cout << "Time Trials: " << endl;
     //TODO: Rename - Sue to Book version .... RecursiveTime to My2ndVersion..... mergeSort1stVersion
     cout << "Elements , \t SueLinkedListTime , \t RecursiveTime , \t MergeSort"  << endl;
-    for (int i = 0; i < 10; i++){
+    for (int i = 0; i < 12; i++){
         double sueLinkedListTrialTime =  SueLinkedListTest(NumStrings[i], stringLen, printflag);
         double recursiveMergeSortTrialTime = RecursiveMergeSortTest(NumStrings[i],stringLen, printflag);
         double mergeSortTrialTime = mergeSortTest(NumStrings[i],stringLen, printflag);
         cout << std::fixed << NumStrings[i] <<" \t" << sueLinkedListTrialTime << " \t" << recursiveMergeSortTrialTime << " \t "<< mergeSortTrialTime <<  endl;
     }
+
+    cout << "EndTimeTrial" << endl;
 }
 
 int main(){
@@ -396,7 +398,7 @@ int main(){
     }
 
 
-
+    cout << "End Program" << endl;
 
     return 0;
 }
