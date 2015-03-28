@@ -161,16 +161,18 @@ Link * mergesTwoLists(Link * subListOne, Link * subListTwo, int printflag){ // m
     return head; //return sorted list
 }
 
-
+//
 Link * recursiveMergeSort(Link  * list, int printflag){ // splits the list, sorts the separate lists, and merges sublists to one sorted list,
     if (list == NULL) return list;// if list pointer is null, then no items in list and return
-    if (list->next == NULL){ // if there is only one item in list
-        if(printflag == 1) { // prints list if user requested
+    if (list->next == NULL) { // if there is only one item in list
+        if (printflag == 1) { // prints list if user requested
             print(list); // calls print function to print list with one item
-            cout<< endl;
+            cout << endl;
         }
         return list;//if next pointer of list is null then return
     }
+    //Create two pointers, ListOne and ListTwo, the first will be the pointer to the first half of the list, and the second will be the pointer to the second half of the list
+
     Link * ListOne; // Declares ListOne pointer
     Link * ListTwo; // Declares ListTwo pointer
     splitList(list, ListOne, ListTwo); // calls function splitlist to split the list into two sublists - ListOne and ListTwo
