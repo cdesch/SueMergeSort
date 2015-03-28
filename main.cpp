@@ -3,7 +3,8 @@
 #include<iostream>
 #include "SueLinkedList.hpp"
 #include "SueLinkNode.hpp"
-
+#include <sys/time.h>
+#include <sys/resource.h>
 using namespace std;
 
 //Mergesort our way
@@ -13,6 +14,32 @@ using namespace std;
 // -- string
 // - Linked Lists
 //
+
+/*
+Folder - zip
+ - The alogrithm code. your final merge
+ - Word Document Analysis
+ - All the workcode
+ */
+class list
+{
+protected:
+
+
+public:
+    list();
+    void print();
+};
+
+//struct Link
+struct Link{
+    Link * next; //Pointer to next node
+    string dataItem; // declares item as a string
+    Link(string data, Link * nextNode){
+        dataItem = data; //sets a string in the list to variable item
+        next = nextNode; // pointer to next item
+    }
+};
 
 // returns the time the program in seconds.
 double getcputime(void){
@@ -27,10 +54,10 @@ double getcputime(void){
 }
 
 //String Sample Context
-static const char alphanum[] =
-        "0123456789"
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                "abcdefghijklmnopqrstuvwxyz";
+static char const alphanum[] =
+        "0123456789";
+        //        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        //        "abcdefghijklmnopqrstuvwxyz";
 
 //Length of the string
 int stringLength = sizeof(alphanum) - 1;
@@ -60,6 +87,99 @@ string generateRandomStringOfLength(int length){
     }
     return myGeneratedString; //returns the random string
 }
+
+void print(Link * list){ //prints the list of items
+    while (list != NULL){ //continues until the end of the list is reached
+        cout << list-> dataItem << " "; // list the string and separate with spaces
+        list = list->next; // Move along one node, list points to the node coming after the node it was previously pointing to set up for priting item
+    }
+    cout << endl;
+}
+
+void splitList(Link * list, Link * &subListOne, Link * &subListTwo){ // splits one list into two sublists
+    if (list == NULL) return; // if list is empty return
+    // To split the list requires to traverse the list with two pointers, Node1 and Node2.
+    Link* Node1; // Declares Node1
+    Node1 = list; // Makes Node1 pointer identical to list pointer. The pointer Node1 is initialized to the first node of the list
+    list = list->next; // Moves along one node, list points to the node coming after the node it was previously pointing to
+    Node1->next = NULL; // Next pointer of the Node1 points to null
+    subListOne = Node1; // Makes subLisOne pointer identical to Node1 pointer
+
+    Link* Node2; // Declares Node2
+    Node2 = list; // Makes Node2 pointer identical to list pointer. Since list has already traversed in the above code, Node2 starts at the third node.
+    list = list->next; // Moves along another node, list points to the node coming after the node it was previously pointing to
+    Node2->next = NULL; // Next pointer of the Node2 points to null
+    subListTwo = Node2; // Makes subListTwo pointer identical to Node2 pointer
+
+    if (list == NULL) return; // if list pointer points to Null then return
+
+    while (list != NULL){ // while the list is not empty
+        // while will end when Node2 becomes Null then Node1 will point to middle of list, which will be the last node of subList.
+        Node1->next = list; // Node1 moves along one node. Sets pointer from the last node of list to the node just added to Node1.
+        Node1 = list; // Makes Node1 pointer identical to list pointer
+        list = list->next; // Move to next link in chain, list points to the node coming after the node it was previously pointing to
+        Node1->next = NULL; // Next pointer of the Node1 points to null
+
+        if (list == NULL) break; // Break if list pointer is pointing to Null
+        // Node2 moves along two nodes everytime Node1 moves one node.
+        Node2->next = list; // Sets pointer from the last node of list to the node just added
+        Node2 = list; // Makes Node2 pointer identical to list pointer
+        list = list->next; // Moves to next link in chain, list points to the node coming after the node it was previously pointing to
+        Node2->next = NULL; // Next pointer of the Node2 list points to null
+    }
+}
+
+Link * mergesTwoLists(Link * subListOne, Link * subListTwo, int printflag){ // merges two sublists to one sorted list
+    Link * head = NULL; // Declares head pointer to Null
+    Link * headSecondList = NULL; // Declares head of second sublist to Null
+    while (subListOne != NULL && subListTwo != NULL){ // While there are items in both sublists then do the following until hit end both lists are empty
+        Link * tempList; // Declares a temporary pointer.
+        if (subListOne->dataItem <= subListTwo->dataItem){ // compare the nodes and checks to see if item in sublistOne is less than or equal to item in sublistTwo
+            tempList = subListOne; // When subListTwo data item is less than or equal to subListOne data item then Make templist pointer identical to subListOne pointer
+            subListOne = subListOne->next; // Moves to next link in chain, subListOne points to the node coming after the node it was previously pointing to
+        }
+        else{
+            tempList = subListTwo; // When subListOne data item is less than subListTwo data item then Make templist pointer identical to subListTwo pointer
+            subListTwo = subListTwo->next; // Moves to next link in chain, subListTwo points to the node coming after the node it was previously pointing to
+        }
+        if (head == NULL) // if head pointer is null
+            head = tempList; // Makes head pointer identical to templist pointer
+        else
+            headSecondList->next = tempList; // Sets pointer from the last node of templist to the node just added to head of second sublist.
+        headSecondList = tempList; // Makes head pointer of second sublist identical to templist pointer
+        headSecondList->next = NULL; // Next pointer of the head of second sublist points to null
+    }// end while
+
+    if (subListOne != NULL) headSecondList->next = subListOne; // Copy into combined list if there are any remaining elements of subListOne
+    else if (subListTwo != NULL) // Copy into combined list if there are any remaining elements of subListTwo
+        headSecondList->next = subListTwo; // set pointer from the last node of subListTwo to the node just added to head of second sublist.
+
+    if(printflag == 1) { // prints list if user requested to print list
+        print(head); // calls print function to print sorted list
+        cout<< endl;
+    } // end if
+    return head; //return sorted list
+}
+
+
+Link * recursiveMergeSort(Link  * list, int printflag){ // splits the list, sorts the separate lists, and merges sublists to one sorted list,
+    if (list == NULL) return list;// if list pointer is null, then no items in list and return
+    if (list->next == NULL){ // if there is only one item in list
+        if(printflag == 1) { // prints list if user requested
+            print(list); // calls print function to print list with one item
+            cout<< endl;
+        }
+        return list;//if next pointer of list is null then return
+    }
+    Link * ListOne; // Declares ListOne pointer
+    Link * ListTwo; // Declares ListTwo pointer
+    splitList(list, ListOne, ListTwo); // calls function splitlist to split the list into two sublists - ListOne and ListTwo
+    ListOne = recursiveMergeSort(ListOne, 0); // sorts sublist ListOne, recursively calls sort
+    ListTwo = recursiveMergeSort(ListTwo, 0); // sorts sublist ListTwo, recursively calls sort
+    list = mergesTwoLists(ListOne, ListTwo, printflag);// merges two sublists to one list
+    return list; // return one sorted list
+}
+
 
 //Merge Function combines arrayLeft and arrayRight.
 // arrayLeft goes from head to the middle and arrayRight goes from middle + 1 to tail
@@ -126,130 +246,11 @@ void mergeSort(string arrayList[], int left, int right)
     }
 }
 
-////////MergeSortWithLinkedListBookVersion
 
-void MSBDivide(SueLinkNode* first, SueLinkNode* &second ){
-    SueLinkNode* middle;
-    SueLinkNode* current;
+double mergeSortTest(int NumStrings, int stringLen, int printflag){
 
-    //Check for empty list
-    if(first == NULL){
-        second = NULL;
-    }else if (first->getNext() == NULL){
-        second = NULL;
-    }else{
-        middle = first;
-        current = first->getNext();
-        if(current != NULL){
-            current = current->getNext();
-        }
-        while(current != NULL){
-            middle = middle->getNext();
-            current = current->getNext();
-            if(current != NULL){
-                current = current->getNext();
-            }
-        }
-        second = middle->getNext();
-        middle->setNext(NULL);
-    }
-}
-
-SueLinkNode* MSBMergeList(SueLinkNode* first, SueLinkNode* second){
-    SueLinkNode* lastSmall;
-    SueLinkNode* newHead;
-
-
-    if(first == NULL){
-        return second;
-    }else if(second == NULL){
-        return first;
-    }else{
-        if(first < second){
-            newHead = first;
-            first = first->getNext();
-            lastSmall = newHead;
-        }else{
-            newHead = second;
-            second = second->getNext();
-            lastSmall = newHead;
-        }
-
-        while(first != NULL && second != NULL){
-            if(first < second){ ///I don't get it
-                lastSmall->setNext(first);
-                lastSmall = lastSmall->getNext();
-                first = first->getNext();
-            }else{
-                lastSmall->setNext(second);
-                lastSmall = lastSmall->getNext();
-                second = second->getNext();
-            }
-        }
-
-        if(first == NULL){
-            lastSmall->setNext(second);
-        }else{
-            lastSmall->setNext(first);
-        }
-
-        return newHead;
-
-    }
-
-}
-
-void MSBRecMergeSort(SueLinkNode* & head){
-    SueLinkNode* otherHead;
-    if(head != NULL){
-        if (head->getNext() != NULL){
-            MSBDivide(head,otherHead);
-            MSBRecMergeSort(head);
-            MSBRecMergeSort(otherHead);
-            head = MSBMergeList(head,otherHead);
-        }
-    }
-
-
-}
-
-void MSBMergeSort(SueLinkedList* linkedList){
-
-
-    SueLinkNode* first = linkedList->getHead();
-    SueLinkNode* last = linkedList->getTail();
-    MSBRecMergeSort(first);
-    if(first == NULL){
-        last = NULL;
-    }else{
-        last = first;
-        while(last->getNext() != NULL){
-            last = last->getNext();
-        }
-    }
-
-    cout << "First " ;
-    for (int i = 0; i < linkedList->getSize(); i++){
-        cout << first->getData() << " ";
-        first = first->getNext();
-    }
-    cout << endl;
-
-}
-
-
-
-void mergeSortTest(){
-    int NumStrings = 0; // initialize NumStrings which is the variable for number of strings
-    int stringLen = 0; // initialize string length variable to 0
-    int printflag = 0; // initialize print flag to 0
-    cout << "Enter the number of strings to sort? ";
-    cin >> NumStrings;
     string * arrayList = new string[NumStrings];
-    cout << "Enter the string length? ";
-    cin >> stringLen;
-    cout << "Enter 1 if you would like to print the sorted list OR enter any other number to NOT print the list? ";
-    cin >> printflag;
+
     for (int i = 0; i < NumStrings; i+=1) // Loops to set the random strings to the list
         arrayList[i] = generateRandomStringOfLength(stringLen); // builds a linked list that is generated by random strings of length stringlength
     if(printflag == 1){ // if user wants to print list then prints unsorted list
@@ -265,103 +266,135 @@ void mergeSortTest(){
     double timeStart = getcputime(); // gets initial cpu start time
     mergeSort(arrayList, 0, NumStrings-1);
     double timeEnd = getcputime(); // gets cpu end time
-    if(printflag == 1) for (int i = 0; i < NumStrings; i++) cout << arrayList[i] << "   ";
-    cout << endl << endl << "Time it took to sort list is: " << timeEnd-timeStart << " seconds" << endl; // prints the time the algorithm took by subtracting the end time and start time
+    if(printflag == 1){
+        for (int i = 0; i < NumStrings; i++) cout << arrayList[i] << "   ";
+        cout << endl << endl << "Time it took to sort list is: " << timeEnd-timeStart << " seconds" << endl; // prints the time the algorithm took by subtracting the end time and start time
 
+    }
+    return timeEnd - timeStart;
 }
 
 
 
-void linkedListTest( int NumStrings, int stringLen){
+double SueLinkedListTest(int NumStrings, int stringLen, int printflag){
 
     SueLinkedList* myLinkedList = new SueLinkedList();
 
 
-    for(int i = 0; i < 10; i++){
-       cout << random(stringLen) << " ";
-    }
-    cout << endl;
-
     for (int i = 0; i < NumStrings; i+=1) // Loops to set the random strings to the list
-        myLinkedList->addNode(random(stringLen));
+        myLinkedList->addNode(generateRandomStringOfLength(stringLen));
 
-    cout << "unsorted Linked List: " ;
-    for (int i = 0; i < NumStrings; i+=1){
-        SueLinkNode* myNode = myLinkedList->getNode(i);
-        cout << myNode->getData() << " ";
+    if(printflag == 1){ // if user wants to print list then prints unsorted list
+        cout << "unsorted Linked List: " ;
+        for (int i = 0; i < NumStrings; i+=1){
+            SueLinkNode* myNode = myLinkedList->getNode(i);
+            cout << myNode->getData() << " ";
+        }
+        cout << endl;
     }
-    cout << endl;
 
-    MSBMergeSort(myLinkedList);
+    double timeStart = getcputime(); // gets initial cpu start time
+    myLinkedList->MSBMergeSort();
+    double timeEnd = getcputime(); // gets cpu end time
 
 
-    cout << "Sorted Linked List: " ;
-    for (int i = 0; i < myLinkedList->getSize(); i+=1){
-        SueLinkNode* myNode = myLinkedList->getNode(i);
-        cout << myNode->getData() << " ";
+    if(printflag == 1){ // if user wants to print list then prints unsorted list
+        cout << std::fixed << "Time to sort list is: " << timeEnd-timeStart << " seconds" << endl; // prints the time the algorithm took by subtracting the end time and start time
+
+
+        cout << "Sorted Linked List: " ;
+        for (int i = 0; i < myLinkedList->getSize(); i+=1){
+            SueLinkNode* myNode = myLinkedList->getNode(i);
+            cout << myNode->getData() << " ";
+        }
+        cout << endl;
     }
-    cout << endl;
+
+    return timeEnd-timeStart;
 
 }
 
-void linkedListTestComparisonOperators(){
 
-    SueLinkNode* node1 = new SueLinkNode("1");
-    SueLinkNode* node2 = new SueLinkNode("2");
-    SueLinkNode* node3 = new SueLinkNode("2");
-    SueLinkNode* node4 = new SueLinkNode("3");
-    if(node1 < node2){
-        cout << "Node 1 is less than node 2" << endl;
-    }else{
-        cout << "Node 1 is not less than node 2" << endl;
+double RecursiveMergeSortTest(int NumStrings, int stringLen, int printflag){
+
+
+    Link * list = NULL; // initalize list pointerto Null
+
+
+    for (int i = 0; i < NumStrings; i+=1) // Loops to set the random strings to the list
+        list = new Link(generateRandomStringOfLength(stringLen), list); // builds a linked list that is generated by random strings of length stringlength
+    if(printflag == 1){ // if user wants to print list then prints unsorted list
+        cout << endl;
+        cout << "Unsorted List\n";
+        cout << "*************\n";
+        print(list); // prints unsorted list
+        cout << endl;
+        cout << "Sorted List\n";
+        cout << "***********\n";
     }
+    double timeStart = getcputime(); // gets initial cpu start time
+    recursiveMergeSort(list, printflag); // starts the sorting algorithm
+    double timeEnd = getcputime(); // gets cpu end time
 
-    if(node2 < node1){
-        cout << "Node 1 is less than node 2" << endl;
-    }else{
-        cout << "Node 1 is not less than node 2" << endl;
+    if (printflag==1){
+        cout << std::fixed << "Time to sort list is: " << timeEnd-timeStart << " seconds" << endl; // prints the time the algorithm took by subtracting the end time and start time
     }
+    return timeEnd-timeStart;
+}
 
-    if(node1 > node2){
-        cout << "Node 1 is greater than node 2" << endl;
-    }else{
-        cout << "Node 1 is not greater than node 2" << endl;
+void timeTrials(){
+
+    //TODO: nextTime Copy SueLinkedList into a Template Based one
+    int stringLen = 3;
+    int NumStrings [12] = { 10, 50, 100, 200, 300, 500, 750, 1000, 2000, 5000, 10000, 20000 };
+    int printflag = 0;
+
+    cout << "Time Trials: " << endl;
+    //TODO: Rename - Sue to Book version .... RecursiveTime to My2ndVersion..... mergeSort1stVersion
+    cout << "Elements , \t SueLinkedListTime , \t RecursiveTime , \t MergeSort"  << endl;
+    for (int i = 0; i < 10; i++){
+        double sueLinkedListTrialTime =  SueLinkedListTest(NumStrings[i], stringLen, printflag);
+        double recursiveMergeSortTrialTime = RecursiveMergeSortTest(NumStrings[i],stringLen, printflag);
+        double mergeSortTrialTime = mergeSortTest(NumStrings[i],stringLen, printflag);
+        cout << std::fixed << NumStrings[i] <<" \t" << sueLinkedListTrialTime << " \t" << recursiveMergeSortTrialTime << " \t "<< mergeSortTrialTime <<  endl;
     }
-    if(node2 > node1){
-        cout << "Node 2 is greater than node 1" << endl;
-    }else{
-        cout << "Node 1 is not greater than node 2" << endl;
-    }
-
-    if(node2 <= node3){
-        cout << "Node 2 is less than or equal node 3" << endl;
-    }else{
-        cout << "Node 2 is not less or equal than node 3" << endl;
-    }
-
-    if(node3 <= node2){
-        cout << "Node 3 is less than or equal node 2" << endl;
-    }else{
-        cout << "Node 3 is not less or equal than node 2" << endl;
-    }
-
-    if(node2 >= node3){
-        cout << "Node 2 is greater than or equal node 3" << endl;
-    }else{
-        cout << "Node 2 is not greater or equal than node 3" << endl;
-    }
-
-
-
-
-
-
 }
 
 int main(){
-    //mergeSortTest();
-    linkedListTest(5,5);
-    //linkedListTestComparisonOperators();
+
+    int timeTrialInputSelect;
+    cout << "Time Trials? (select #1)" ;
+    cin >> timeTrialInputSelect;
+
+    if(timeTrialInputSelect == 1){
+        timeTrials();
+    }else{
+
+
+        //TODO Ask user 1,2 or 3 for which one to run
+        int NumStrings = 0; // initialize NumStrings which is the variable for number of strings
+        int stringLen = 0; // initialize string length variable to 0
+        int printflag = 0; // initialize print flag to 0
+        Link * list = NULL; // initalize list pointerto Null
+        cout << "Enter the number of strings to sort? ";
+        cin >> NumStrings;
+        cout << "Enter the string length? ";
+        cin >> stringLen;
+        cout << "Enter 1 if you would like to print the sorted list OR enter any other number to NOT print the list? ";
+        cin >> printflag;
+
+        //User input
+
+        //mergeSortTest(NumStrings, stringLen, printflag);
+        SueLinkedListTest(NumStrings, stringLen, printflag);
+        RecursiveMergeSortTest(NumStrings,stringLen, printflag);
+
+        //linkedListTestComparisonOperators();
+
+    }
+
+
+
 
     return 0;
 }

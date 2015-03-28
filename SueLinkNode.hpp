@@ -29,6 +29,7 @@ public:
 
     ~SueLinkNode(){
         //TODO: tell the next node it is going to be deleted
+        cout << __PRETTY_FUNCTION__ << endl;
         this->next->prepareForDeletion();
         delete this->next;
         this->prepareForDeletion();
@@ -58,35 +59,8 @@ public:
         this->setNextToNull();
     }
 
-    friend bool operator> (SueLinkNode &node1, SueLinkNode &node2);
-    friend bool operator<= (SueLinkNode &node1, SueLinkNode &node2);
-
-    friend bool operator< (SueLinkNode &node1, SueLinkNode &node2);
-    friend bool operator>= (SueLinkNode &node1, SueLinkNode &node2);
-
-    //Operators
-
-
 
 };
 
-bool operator > (SueLinkNode &node1, SueLinkNode &node2)
-{
-    return node1.getData().compare(node2.getData()) == 1 ? true : false ;
-}
 
-bool operator<= (SueLinkNode &node1, SueLinkNode &node2)
-{
-    return node1.getData().compare(node2.getData()) <= 0 ? true : false ;
-}
-
-bool operator< (SueLinkNode &node1, SueLinkNode &node2)
-{
-    return node1.getData().compare(node2.getData()) < 0 ? true : false ;
-}
-
-bool operator>= (SueLinkNode &node1, SueLinkNode &node2)
-{
-    return node1.getData().compare(node2.getData()) >= 0 ? true : false ;
-}
 #endif //_SUEMERGESORT_SUELINKNODE_HPP_

@@ -43,6 +43,7 @@ public:
 
     ~SueLinkedList(){
         //this->head-
+        cout << __PRETTY_FUNCTION__ << endl;
         this->head->prepareForDeletion();
         delete this->head;
         this->head = NULL;
@@ -144,6 +145,103 @@ public:
         }
         this->numNodes = i; //Reset our number of nodes since we didn't know what it was.
         return node;
+    }
+
+    void MSBDivide(SueLinkNode* first, SueLinkNode* &second ){
+        SueLinkNode* middle;
+        SueLinkNode* current;
+
+        //Check for empty list
+        if(first == NULL){
+            second = NULL;
+        }else if (first->getNext() == NULL){
+            second = NULL;
+        }else{
+            middle = first;
+            current = first->getNext();
+            if(current != NULL){
+                current = current->getNext();
+            }
+            while(current != NULL){
+                middle = middle->getNext();
+                current = current->getNext();
+                if(current != NULL){
+                    current = current->getNext();
+                }
+            }
+            second = middle->getNext();
+            middle->setNext(NULL);
+        }
+    }
+
+    SueLinkNode* MSBMergeList(SueLinkNode* first, SueLinkNode* second){
+        SueLinkNode* lastSmall;
+        SueLinkNode* newHead;
+
+        if(first == NULL){
+            return second;
+        }else if(second == NULL){
+            return first;
+        }else{
+            if(first->getData() < second->getData()){
+                newHead = first;
+                first = first->getNext();
+                lastSmall = newHead;
+            }else{
+                newHead = second;
+                second = second->getNext();
+                lastSmall = newHead;
+            }
+
+            while(first != NULL && second != NULL){
+                if(first->getData() < second->getData()){
+                    lastSmall->setNext(first);
+                    lastSmall = lastSmall->getNext();
+                    first = first->getNext();
+                }else{
+                    lastSmall->setNext(second);
+                    lastSmall = lastSmall->getNext();
+                    second = second->getNext();
+                }
+            }
+
+            if(first == NULL){
+                lastSmall->setNext(second);
+            }else{
+                lastSmall->setNext(first);
+            }
+
+            return newHead;
+
+        }
+
+    }
+
+    void MSBRecMergeSort(SueLinkNode* & head){
+        SueLinkNode* otherHead;
+        if(head != NULL){
+            if (head->getNext() != NULL){
+                MSBDivide(head,otherHead);
+                MSBRecMergeSort(head);
+                MSBRecMergeSort(otherHead);
+                head = MSBMergeList(head,otherHead);
+            }
+        }
+
+
+    }
+
+    void MSBMergeSort(){
+        MSBRecMergeSort(this->head);
+        if(this->head == NULL){
+            this->tail = NULL;
+        }else{
+            this->tail = this->head;
+            while(this->tail->getNext() != NULL){
+                this->tail = this->tail->getNext();
+            }
+        }
+
     }
 
 
